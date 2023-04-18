@@ -1,16 +1,20 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
-export default function AddEmployee() {
+export default function EditEmployee() {
 
-    let navigate=useNavigate()
+    let navigate=useNavigate();
+
+    const {id}=useParams()
 
         const [employee, setEmployees]=useState({
+            id:"",
             firstName:"",
             lastName:"",
             emailId:"",
         });
+        
 
         const{firstName, lastName, emailId}=employee
 
@@ -20,18 +24,42 @@ export default function AddEmployee() {
 
         };
 
+        useEffect(()=>{
+            loadEmployees()
+        },[])
+
         const onSubmit=async (e)=>{
             e.preventDefault();
-            await axios.post("http://localhost:3030/api/v1/employees/", employee)
-            navigate("/")
+            await axios.put(`http://localhost:3030/api/v1/employees/${id}`, employee);
+            navigate("/");
 
+        }
+
+        const loadEmployees= async () =>{
+            const result=await axios.get(`http://localhost:3030/api/v1/employees/${id}`)
+            setEmployees(result.data)
         }
         return (
             <div className="container">
                 <div className='="row'>
                     <div className="col-md offset-md-3 border rouunded p-4 mt-2 shadow">
-                        <h2 className="text-center m-4">Register Employee</h2>
+                        <h2 className="text-center m-4">Edit Employee</h2>
                         <form onSubmit={(e)=>onSubmit(e)}>
+
+                        <div className="mb-3">
+                            <label htmlFor="Employee Id" className='form-label'>
+                               Employee Id
+                            </label>
+                            <input
+                            type={"text"}
+                            className="form-control"
+                            placeholder='Enter employee id'
+                            name='id'
+                            value={id}
+                            onChange={(e)=>onInputChange(e)}
+                            />
+
+                        </div>    
                         <div className="mb-3">
                             <label htmlFor="First Name" className='form-label'>
                                First Name
